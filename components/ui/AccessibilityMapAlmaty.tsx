@@ -1740,7 +1740,7 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
                           </div>
                         </div>
 
-                        {selectedPlace.photos?.accessibility?.length > 0 && (
+{(selectedPlace.photos?.accessibility?.length ?? 0) > 0 && (
                           <div>
                             <h4 className="text-sm font-semibold mb-2">
                               Элементы доступности:
