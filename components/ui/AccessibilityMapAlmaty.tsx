@@ -1746,7 +1746,8 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
                               Элементы доступности:
                             </h4>
                             <div className="flex gap-2 overflow-x-auto pb-1">
-                              {selectedPlace.photos.accessibility.map((src) => (
+                              {(selectedPlace.photos?.accessibility ?? []).map((src) => (
+
                                 <img
                                   key={src}
                                   src={src}
