@@ -1741,23 +1741,28 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
                         </div>
 
 {(selectedPlace.photos?.accessibility?.length ?? 0) > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold mb-2">
-                              Элементы доступности:
-                            </h4>
-                            <div className="flex gap-2 overflow-x-auto pb-1">
-                              {(selectedPlace.photos?.accessibility ?? []).map((src) => (
+  <div>
+    <h4 className="text-sm font-semibold mb-2">
+      Элементы доступности:
+    </h4>
 
-                                <img
-                                  key={src}
-                                  src={src}
-                                  className="h-16 w-24 sm:h-20 sm:w-28 rounded-xl object-cover"
-                                  alt=""
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        )}
+    <div className="flex gap-2 overflow-x-auto pb-1">
+      {(selectedPlace.photos?.accessibility ?? []).map((raw) => {
+        // raw = "picture/PSMP/IMG_5622.PNG" или "/picture/PSMP/IMG_5622.PNG"
+        const src = raw.startsWith("/") ? raw : `/${raw}`;
+
+        return (
+          <img
+            key={src}
+            src={src}
+            alt="Элемент доступности"
+            className="w-20 h-20 rounded-xl object-cover border border-gray-200"
+          />
+        );
+      })}
+    </div>
+  </div>
+)}
 
                         {/* Оценка доступности пользователем */}
                         <div className="border rounded-xl p-3 bg-white">
