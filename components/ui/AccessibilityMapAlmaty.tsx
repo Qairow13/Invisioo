@@ -897,6 +897,44 @@ export default function AccessibilityMapAlmaty() {
 const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
 
   const [browserId, setBrowserId] = useState<string | null>(null);
+// === КОМПОНЕНТ ДЛЯ РЕНДЕРА ОЦЕНОК ===
+function CategoryScoresChips({ scores }: { scores: any }) {
+  if (!scores) return null;
+
+  const chips = [
+    { key: "wheelchair",   label: "Кресло-коляска",            value: scores.wheelchair },
+    { key: "mobility",     label: "Опорно-двигательный аппарат", value: scores.mobility },
+    { key: "temporary",    label: "Временно травмированные",   value: scores.temporary },
+    { key: "intellectual", label: "Интеллектуальная инвалидность", value: scores.intellectual },
+    { key: "vision",       label: "Нарушение зрения",          value: scores.vision },
+    { key: "hearing",      label: "Нарушение слуха",           value: scores.hearing },
+  ].filter((c) => typeof c.value === "number");
+
+  if (!chips.length) return null;
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {chips.map((chip) => {
+        const v = chip.value as number;
+        const isBad = v <= 4;
+
+        const bg = isBad ? "bg-[#ffe4e4]" : "bg-[#fff3b8]";
+        const text = isBad ? "text-[#c62b2b]" : "text-[#a86b00]";
+        const border = isBad ? "border-[#ffb3b3]" : "border-[#ffd36b]";
+
+        return (
+          <div
+            key={chip.key}
+            className={`${bg} ${text} border ${border} inline-flex items-center rounded-full px-3 py-1 text-xs font-medium`}
+          >
+            <span className="mr-2">{chip.label}</span>
+            <span>{v}/10</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
   // 👇 флаг мобилки
   const [isMobile, setIsMobile] = useState(false);
@@ -1522,6 +1560,14 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
             px-2 md:px-0
           "
         >
+          <div className="rounded-2xl bg-[#fff7e6] p-3 border border-[#ffe0a3] mb-3">
+  <h4 className="text-sm font-semibold mb-2">
+    Оценка доступности по категориям (1–10)
+  </h4>
+
+  <CategoryScoresChips scores={selectedPlace.scores} />
+</div>
+
           <Card className="rounded-t-3xl md:rounded-2xl shadow-2xl border-0 bg-white">
             <CardContent className="p-0">
               {/* Tabs */}
@@ -1589,6 +1635,7 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
                         <p className="text-gray-800">
                           <b>Категория:</b> {selectedPlace.category}
                         </p>
+                        
                         <p className="text-gray-800">
                           <b>Адрес:</b> {selectedPlace.address}
                         </p>
@@ -1703,6 +1750,21 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
 
                         {/* Средние оценки по категориям */}
                         <div className="bg-white border border-gray-200 rounded-xl p-3">
+                          <details className="mt-3 rounded-2xl bg-[#fff7e6] border border-[#ffe0a3]">
+  <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between">
+    <span className="text-sm font-semibold">
+      Оценка доступности по категориям (1–10)
+    </span>
+    <span className="text-xs text-gray-500">
+      нажмите, чтобы открыть / скрыть
+    </span>
+  </summary>
+
+  <div className="px-3 pb-3">
+    <CategoryScoresChips scores={selectedPlace.scores} />
+  </div>
+</details>
+
                           <h4 className="text-sm font-semibold mb-2">
                             Оценка доступности по категориям (1–10)
                           </h4>
