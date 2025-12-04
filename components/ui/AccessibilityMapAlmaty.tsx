@@ -184,11 +184,11 @@ const INITIAL_PLACES: Place[] = [
 
     photos: {
       outside: [
-        "/picture/PSMP/IMG_5623.png",
-        "/picture/PSMP/IMG_5625.png",
-        "/picture/PSMP/IMG_5626.png",
+        "/picture/PSMP/IMG_5623.PNG",
+        "/picture/PSMP/IMG_5625.PNG",
+        "/picture/PSMP/IMG_5626.PNG",
       ],
-      accessibility: ["/picture/PSMP/IMG_5624.png", "/picture/PSMP/IMG_5622.png"],
+      accessibility: ["/picture/PSMP/IMG_5624.PNG", "/picture/PSMP/IMG_5622.PNG"],
     },
   },
 
@@ -411,13 +411,13 @@ const INITIAL_PLACES: Place[] = [
 
     photos: {
       outside: [
-        "/picture/Zhibek_zholy/IMG_5618.png",
-        "/picture/Zhibek_zholy/IMG_5621.png",
-        "/picture/Zhibek_zholy/IMG_5619.png",
+        "/picture/Zhibek_zholy/IMG_5618.PNG",
+        "/picture/Zhibek_zholy/IMG_5621.PNG",
+        "/picture/Zhibek_zholy/IMG_5619.PNG",
       ],
       accessibility: [
-        "/picture/Zhibek_zholy/IMG_5617.png",
-        "/picture/Zhibek_zholy/IMG_5620.png",
+        "/picture/Zhibek_zholy/IMG_5617.PNG",
+        "/picture/Zhibek_zholy/IMG_5620.PNG",
       ],
     },
   },
@@ -443,13 +443,13 @@ const INITIAL_PLACES: Place[] = [
 
     photos: {
       outside: [
-        "/picture/hospital16/IMG_5668.png",
-        "/picture/hospital16/IMG_5669.png",
-        "/picture/hospital16/IMG_5670.png",
+        "/picture/hospital16/IMG_5668.PNG",
+        "/picture/hospital16/IMG_5669.PNG",
+        "/picture/hospital16/IMG_5670.PNG",
       ],
       accessibility: [
-        "/picture/hospital16/IMG_5671.png",
-        "/picture/hospital16/IMG_5672.png",
+        "/picture/hospital16/IMG_5671.PNG",
+        "/picture/hospital16/IMG_5672.PNG",
       ],
     },
   },
@@ -475,13 +475,13 @@ const INITIAL_PLACES: Place[] = [
 
     photos: {
       outside: [
-        "/picture/dostyq_plaza/IMG_5653.png",
-        "/picture/dostyq_plaza/IMG_5655.png",
-        "/picture/dostyq_plaza/IMG_5654.png",
+        "/picture/dostyq_plaza/IMG_5653.PNG",
+        "/picture/dostyq_plaza/IMG_5655.PNG",
+        "/picture/dostyq_plaza/IMG_5654.PNG",
       ],
       accessibility: [
-        "/picture/dostyq_plaza/IMG_5656.png",
-        "/picture/dostyq_plaza/IMG_5657.png",
+        "/picture/dostyq_plaza/IMG_5656.PNG",
+        "/picture/dostyq_plaza/IMG_5657.PNG",
       ],
     },
   },
@@ -498,13 +498,13 @@ const INITIAL_PLACES: Place[] = [
     supports: ["wheelchair", "motor"],
     photos: {
       outside: [
-        "/picture/moscow/IMG_5673.png",
-        "/picture/moscow/IMG_5676.png",
-        "/picture/moscow/IMG_5677.png",
+        "/picture/moscow/IMG_5673.PNG",
+        "/picture/moscow/IMG_5676.PNG",
+        "/picture/moscow/IMG_5677.PNG",
       ],
       accessibility: [
-        "/picture/moscow/IMG_5674.png",
-        "/picture/moscow/IMG_5675.png",
+        "/picture/moscow/IMG_5674.PNG",
+        "/picture/moscow/IMG_5675.PNG",
       ],
     },
   },
@@ -521,13 +521,13 @@ const INITIAL_PLACES: Place[] = [
     supports: ["vision"],
     photos: {
       outside: [
-        "/picture/mega_park/IMG_5651.png",
-        "/picture/mega_park/IMG_5652.png",
-        "/picture/mega_park/IMG_5649.png",
+        "/picture/mega_park/IMG_5651.PNG",
+        "/picture/mega_park/IMG_5652.PNG",
+        "/picture/mega_park/IMG_5649.PNG",
       ],
       accessibility: [
-        "/picture/mega_park/IMG_5648.png",
-        "/picture/mega_park/IMG_5650.png",
+        "/picture/mega_park/IMG_5648.PNG",
+        "/picture/mega_park/IMG_5650.PNG",
       ],
     },
   },
