@@ -250,13 +250,13 @@ const INITIAL_PLACES: Place[] = [
 
     photos: {
       outside: [
-        "/picture/hospital1/IMG_5667.png",
-        "/picture/hospital1/IMG_5665.png",
-        "/picture/hospital1/IMG_5663.png",
+        "/picture/hospital1/IMG_5667.PNG",
+        "/picture/hospital1/IMG_5665.PNG",
+        "/picture/hospital1/IMG_5663.PNG",
       ],
       accessibility: [
-        "/picture/hospital1/IMG_5664.png",
-        "/picture/hospital1/IMG_5666.png",
+        "/picture/hospital1/IMG_5664.PNG",
+        "/picture/hospital1/IMG_5666.PNG",
       ],
     },
   },
