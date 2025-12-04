@@ -897,44 +897,7 @@ export default function AccessibilityMapAlmaty() {
 const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
 
   const [browserId, setBrowserId] = useState<string | null>(null);
-// === КОМПОНЕНТ ДЛЯ РЕНДЕРА ОЦЕНОК ===
-function CategoryScoresChips({ scores }: { scores: any }) {
-  if (!scores) return null;
-
-  const chips = [
-    { key: "wheelchair",   label: "Кресло-коляска",            value: scores.wheelchair },
-    { key: "mobility",     label: "Опорно-двигательный аппарат", value: scores.mobility },
-    { key: "temporary",    label: "Временно травмированные",   value: scores.temporary },
-    { key: "intellectual", label: "Интеллектуальная инвалидность", value: scores.intellectual },
-    { key: "vision",       label: "Нарушение зрения",          value: scores.vision },
-    { key: "hearing",      label: "Нарушение слуха",           value: scores.hearing },
-  ].filter((c) => typeof c.value === "number");
-
-  if (!chips.length) return null;
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      {chips.map((chip) => {
-        const v = chip.value as number;
-        const isBad = v <= 4;
-
-        const bg = isBad ? "bg-[#ffe4e4]" : "bg-[#fff3b8]";
-        const text = isBad ? "text-[#c62b2b]" : "text-[#a86b00]";
-        const border = isBad ? "border-[#ffb3b3]" : "border-[#ffd36b]";
-
-        return (
-          <div
-            key={chip.key}
-            className={`${bg} ${text} border ${border} inline-flex items-center rounded-full px-3 py-1 text-xs font-medium`}
-          >
-            <span className="mr-2">{chip.label}</span>
-            <span>{v}/10</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
+const [showFullRating, setShowFullRating] = useState(false);
 
   // 👇 флаг мобилки
   const [isMobile, setIsMobile] = useState(false);
@@ -981,11 +944,14 @@ function CategoryScoresChips({ scores }: { scores: any }) {
   }, []);
 
   // сброс вкладки при смене места
+  // сброс вкладки и формы рейтинга при смене места
   useEffect(() => {
     setActivePlaceTab("access");
     setNewReviewText("");
     setNewReviewRating(5);
+    setShowFullRating(false);
   }, [selectedId]);
+
 
   // авто геолокация при загрузке
   useEffect(() => {
@@ -1560,14 +1526,7 @@ function CategoryScoresChips({ scores }: { scores: any }) {
             px-2 md:px-0
           "
         >
-          <div className="rounded-2xl bg-[#fff7e6] p-3 border border-[#ffe0a3] mb-3">
-  <h4 className="text-sm font-semibold mb-2">
-    Оценка доступности по категориям (1–10)
-  </h4>
-
-  <CategoryScoresChips scores={selectedPlace.scores} />
-</div>
-
+          
           <Card className="rounded-t-3xl md:rounded-2xl shadow-2xl border-0 bg-white">
             <CardContent className="p-0">
               {/* Tabs */}
@@ -1630,12 +1589,13 @@ function CategoryScoresChips({ scores }: { scores: any }) {
                     </div>
 
                     {/* TAB: INFO */}
+                                       {/* TAB: INFO */}
                     {activePlaceTab === "info" && (
-                      <div className="space-y-2 text-xs md:text-sm">
+                      <div className="space-y-3 text-xs md:text-sm">
                         <p className="text-gray-800">
                           <b>Категория:</b> {selectedPlace.category}
                         </p>
-                        
+
                         <p className="text-gray-800">
                           <b>Адрес:</b> {selectedPlace.address}
                         </p>
@@ -1666,8 +1626,52 @@ function CategoryScoresChips({ scores }: { scores: any }) {
                             })}
                           </div>
                         </div>
+
+                        {/* Компактный блок оценок 1–10 как на первой картинке */}
+                        <div className="mt-2 p-3 bg-white border border-gray-200 rounded-xl">
+                          <h4 className="text-xs md:text-sm font-semibold mb-2">
+                            Оценка доступности по категориям (1–10)
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {ACCESS_CATEGORIES.map((c) => {
+                              const score =
+                                ratings[c.id as AccessCategoryId] ??
+                                selectedPlace.scores?.[
+                                  c.id as AccessCategoryId
+                                ] ??
+                                null;
+
+                              const colorClass =
+                                score === null
+                                  ? "bg-gray-100 text-gray-500 border-gray-200"
+                                  : score >= 8
+                                  ? "bg-green-100 text-green-700 border-green-300"
+                                  : score >= 5
+                                  ? "bg-yellow-100 text-yellow-700 border-yellow-300"
+                                  : "bg-red-100 text-red-700 border-red-300";
+
+                              return (
+                                <div
+                                  key={c.id}
+                                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[11px] ${colorClass}`}
+                                >
+                                  <img
+                                    src={c.icon}
+                                    alt=""
+                                    className="w-4 h-4"
+                                  />
+                                  <span>{c.label}</span>
+                                  <span className="font-semibold">
+                                    {score !== null ? `${score}/10` : "—"}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
                     )}
+
 
                     {/* TAB: REVIEWS */}
                     {activePlaceTab === "reviews" && (
@@ -1747,34 +1751,22 @@ function CategoryScoresChips({ scores }: { scores: any }) {
                             {selectedPlace.details.join(", ")}
                           </p>
                         </div>
-
                         {/* Средние оценки по категориям */}
                         <div className="bg-white border border-gray-200 rounded-xl p-3">
-                          <details className="mt-3 rounded-2xl bg-[#fff7e6] border border-[#ffe0a3]">
-  <summary className="cursor-pointer list-none px-3 py-2 flex items-center justify-between">
-    <span className="text-sm font-semibold">
-      Оценка доступности по категориям (1–10)
-    </span>
-    <span className="text-xs text-gray-500">
-      нажмите, чтобы открыть / скрыть
-    </span>
-  </summary>
-
-  <div className="px-3 pb-3">
-    <CategoryScoresChips scores={selectedPlace.scores} />
-  </div>
-</details>
-
                           <h4 className="text-sm font-semibold mb-2">
                             Оценка доступности по категориям (1–10)
                           </h4>
                           <div className="flex flex-wrap gap-2">
                             {ACCESS_CATEGORIES.map((c) => {
                               const score =
-                                ratings[c.id as AccessCategoryId] ?? null;
+                                ratings[c.id as AccessCategoryId] ??
+                                selectedPlace.scores?.[
+                                  c.id as AccessCategoryId
+                                ] ??
+                                null;
 
                               const colorClass =
-                                !score
+                                score === null
                                   ? "bg-gray-100 text-gray-500 border-gray-200"
                                   : score >= 8
                                   ? "bg-green-100 text-green-700 border-green-300"
@@ -1794,7 +1786,7 @@ function CategoryScoresChips({ scores }: { scores: any }) {
                                   />
                                   <span>{c.label}</span>
                                   <span className="font-semibold">
-                                    {score ? `${score}/10` : "—"}
+                                    {score !== null ? `${score}/10` : "—"}
                                   </span>
                                 </div>
                               );
@@ -1804,26 +1796,19 @@ function CategoryScoresChips({ scores }: { scores: any }) {
 
 {(selectedPlace.photos?.accessibility?.length ?? 0) > 0 && (
   <div>
-    <h4 className="text-sm font-semibold mb-2">
-      Элементы доступности:
-    </h4>
+    <h4 className="text-sm font-semibold mb-2">Элементы доступности</h4>
 
     <div className="flex gap-2 overflow-x-auto pb-1">
       {(selectedPlace.photos?.accessibility ?? []).map((raw) => {
         const src = raw.startsWith("/") ? raw : `/${raw}`;
 
         return (
-          <div key={src} className="flex flex-col items-center">
-            <img
-              src={src}
-              alt="Элемент доступности"
-              className="w-20 h-20 rounded-xl object-cover border border-gray-200"
-            />
-            {/* ВРЕМЕННО: покажем путь, который реально используется */}
-            <span className="text-[10px] text-gray-500 break-all mt-1">
-              {src}
-            </span>
-          </div>
+          <img
+            key={src}
+            src={src}
+            alt="Элемент доступности"
+            className="w-24 h-24 md:w-28 md:h-28 rounded-xl object-cover border border-gray-200 shadow-sm flex-shrink-0"
+          />
         );
       })}
     </div>
@@ -1831,146 +1816,173 @@ function CategoryScoresChips({ scores }: { scores: any }) {
 )}
 
 
-                        {/* Оценка доступности пользователем */}
+                                               {/* Оценка доступности пользователем */}
                         <div className="border rounded-xl p-3 bg-white">
-                          <h4 className="text-sm font-semibold mb-2">
-                            Оцените доступность для разных категорий (1–10)
-                          </h4>
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-sm font-semibold">
+                              Ваша оценка доступности (1–10)
+                            </h4>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setShowFullRating((prev) => !prev)
+                              }
+                              className="text-[11px] text-[#177ee1] underline"
+                            >
+                              {showFullRating
+                                ? "Скрыть форму"
+                                : "Поставить / изменить оценку"}
+                            </button>
+                          </div>
 
-                          {ratingLoading && (
-                            <p className="text-xs text-gray-500 mb-2">
-                              Загружаем / сохраняем оценки…
-                            </p>
-                          )}
+                          {showFullRating && (
+                            <>
+                              {ratingLoading && (
+                                <p className="text-xs text-gray-500 mb-2">
+                                  Загружаем / сохраняем оценки…
+                                </p>
+                              )}
 
-                          <div className="space-y-2">
-                            {ACCESS_CATEGORIES.map((cat) => {
-                              const current =
-                                ratings[cat.id as AccessCategoryId] ?? null;
+                              <div className="space-y-2">
+                                {ACCESS_CATEGORIES.map((cat) => {
+                                  const current =
+                                    ratings[cat.id as AccessCategoryId] ??
+                                    null;
 
-                              return (
-                                <div
-                                  key={cat.id}
-                                  className="flex items-center justify-between gap-2 text-[11px]"
-                                >
-                                  <div className="flex items-center gap-2">
-                                    <img
-                                      src={cat.icon}
-                                      alt=""
-                                      className="w-4 h-4"
-                                    />
-                                    <span>{cat.label}</span>
-                                  </div>
+                                  return (
+                                    <div
+                                      key={cat.id}
+                                      className="flex items-center justify-between gap-2 text-[11px]"
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <img
+                                          src={cat.icon}
+                                          alt=""
+                                          className="w-4 h-4"
+                                        />
+                                        <span>{cat.label}</span>
+                                      </div>
 
-                                  <div className="flex items-center gap-1">
-                                    {Array.from({ length: 10 }).map((_, i) => {
-                                      const value = i + 1;
-                                      const active =
-                                        current !== null && value <= current;
-                                      return (
-                                        <button
-                                          key={value}
-                                          type="button"
-                                          onClick={() =>
-                                            selectedPlace &&
-                                            setPlaceRating(
-                                              selectedPlace.id,
-                                              cat.id as AccessCategoryId,
-                                              value
-                                            )
+                                      <div className="flex items-center gap-1">
+                                        {Array.from({ length: 10 }).map(
+                                          (_, i) => {
+                                            const value = i + 1;
+                                            const active =
+                                              current !== null &&
+                                              value <= current;
+                                            return (
+                                              <button
+                                                key={value}
+                                                type="button"
+                                                onClick={() =>
+                                                  selectedPlace &&
+                                                  setPlaceRating(
+                                                    selectedPlace.id,
+                                                    cat.id as AccessCategoryId,
+                                                    value
+                                                  )
+                                                }
+                                                className={`w-5 h-5 rounded-full text-[10px] border flex items-center justify-center ${
+                                                  active
+                                                    ? "bg-[#177ee1] text-white border-[#177ee1]"
+                                                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                                                }`}
+                                              >
+                                                {value}
+                                              </button>
+                                            );
                                           }
-                                          className={`w-5 h-5 rounded-full text-[10px] border flex items-center justify-center
-                                            ${
-                                              active
-                                                ? "bg-[#177ee1] text-white border-[#177ee1]"
-                                                : "border-gray-300 text-gray-600 hover:bg-gray-100"
-                                            }`}
-                                        >
-                                          {value}
-                                        </button>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
 
-                          <p className="mt-2 text-[10px] text-gray-400">
-                            Эти оценки помогают другим людям с инвалидностью
-                            выбирать более удобные места.
-                          </p>
+                              <p className="mt-2 text-[10px] text-gray-400">
+                                Эти оценки помогают другим людям с
+                                инвалидностью выбирать более удобные места.
+                              </p>
 
-                          {/* Кнопки отправки/изменения */}
-                          <div className="mt-3 flex gap-2 flex-wrap">
-                            {Object.keys(ratings).length > 0 &&
-                              !selectedPlace.ratingSubmitted && (
-                                <Button
-                                  className="flex-1 bg-[#177ee1] text-white rounded-xl text-[11px]"
-                                  onClick={async () => {
-                                    if (!selectedPlace) return;
+                              {/* Кнопки отправки/изменения */}
+                              <div className="mt-3 flex gap-2 flex-wrap">
+                                {Object.keys(ratings).length > 0 &&
+                                  !selectedPlace.ratingSubmitted && (
+                                    <Button
+                                      className="flex-1 bg-[#177ee1] text-white rounded-xl text-[11px]"
+                                      onClick={async () => {
+                                        if (!selectedPlace) return;
 
-                                    for (const cat of Object.keys(ratings)) {
-                                      await setPlaceRating(
-                                        selectedPlace.id,
-                                        cat as AccessCategoryId,
-                                        ratings[
-                                          cat as AccessCategoryId
-                                        ] as number
-                                      );
-                                    }
+                                        for (const cat of Object.keys(
+                                          ratings
+                                        )) {
+                                          await setPlaceRating(
+                                            selectedPlace.id,
+                                            cat as AccessCategoryId,
+                                            ratings[
+                                              cat as AccessCategoryId
+                                            ] as number
+                                          );
+                                        }
 
-                                    updatePlace(selectedPlace.id, {
-                                      ratingSubmitted: true,
-                                    });
-                                    alert("Спасибо! Ваша оценка сохранена 🙌");
-                                  }}
-                                >
-                                  Отправить оценку
-                                </Button>
-                              )}
+                                        updatePlace(selectedPlace.id, {
+                                          ratingSubmitted: true,
+                                        });
+                                        alert(
+                                          "Спасибо! Ваша оценка сохранена 🙌"
+                                        );
+                                      }}
+                                    >
+                                      Отправить оценку
+                                    </Button>
+                                  )}
 
-                            {selectedPlace.ratingSubmitted && (
-                              <Button
-                                className="flex-1 bg-yellow-500 text-white rounded-xl text-[11px]"
-                                onClick={() => {
-                                  updatePlace(selectedPlace.id, {
-                                    ratingSubmitted: false,
-                                  });
-                                }}
-                              >
-                                Изменить оценку
-                              </Button>
-                            )}
+                                {selectedPlace.ratingSubmitted && (
+                                  <Button
+                                    className="flex-1 bg-yellow-500 text-white rounded-xl text-[11px]"
+                                    onClick={() => {
+                                      updatePlace(selectedPlace.id, {
+                                        ratingSubmitted: false,
+                                      });
+                                    }}
+                                  >
+                                    Изменить оценку
+                                  </Button>
+                                )}
 
-                            {Object.keys(ratings).length > 0 &&
-                              !selectedPlace.ratingSubmitted && (
-                                <Button
-                                  className="flex-1 bg-green-600 text-white rounded-xl text-[11px]"
-                                  onClick={async () => {
-                                    if (!selectedPlace) return;
+                                {Object.keys(ratings).length > 0 &&
+                                  !selectedPlace.ratingSubmitted && (
+                                    <Button
+                                      className="flex-1 bg-green-600 text-white rounded-xl text-[11px]"
+                                      onClick={async () => {
+                                        if (!selectedPlace) return;
 
-                                    for (const cat of Object.keys(ratings)) {
-                                      await setPlaceRating(
-                                        selectedPlace.id,
-                                        cat as AccessCategoryId,
-                                        ratings[
-                                          cat as AccessCategoryId
-                                        ] as number
-                                      );
-                                    }
+                                        for (const cat of Object.keys(
+                                          ratings
+                                        )) {
+                                          await setPlaceRating(
+                                            selectedPlace.id,
+                                            cat as AccessCategoryId,
+                                            ratings[
+                                              cat as AccessCategoryId
+                                            ] as number
+                                          );
+                                        }
 
-                                    updatePlace(selectedPlace.id, {
-                                      ratingSubmitted: true,
-                                    });
-                                    alert("Изменения сохранены ✔");
-                                  }}
-                                >
-                                  Сохранить изменения
-                                </Button>
-                              )}
-                          </div>
+                                        updatePlace(selectedPlace.id, {
+                                          ratingSubmitted: true,
+                                        });
+                                        alert("Изменения сохранены ✔");
+                                      }}
+                                    >
+                                      Сохранить изменения
+                                    </Button>
+                                  )}
+                              </div>
+                            </>
+                          )}
                         </div>
+
                       </div>
                     )}
 
