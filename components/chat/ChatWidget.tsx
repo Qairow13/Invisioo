@@ -1,155 +1,181 @@
+// components/chat/ChatWidget.tsx
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { askGpt } from "./askGpt";
+import { useEffect, useState, useRef } from "react";
 import { MessageCircle, X } from "lucide-react";
 
 type ChatMessage = {
   id: string;
-  from: "user" | "bot";
-  text: string;
+  role: "user" | "assistant";
+  content: string;
 };
+
+const STORAGE_KEY = "invisioo_chat_history_v1";
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([
-  {
-    id: "welcome",
-    from: "bot",
-    text:
-      "Привет! Я ИИ-ассистент Invisioo. Помогу с доступностью мест и с поиском работы. " +
-      "Если интересуют вакансии — загляните во вкладку «Вакансии» на сайте, а я подскажу, что вам может подойти и помогу сформулировать сильные стороны. " +
-      "Напишите, какая у вас категория инвалидности и что вы ищете 😊",
-  },
-]);
-
-  const [sending, setSending] = useState(false);
+  const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  // загрузка истории из localStorage
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as ChatMessage[];
+      if (Array.isArray(parsed)) {
+        setMessages(parsed);
+      }
+    } catch {
+      // игнорируем
+    }
+  }, []);
+
+  // сохранение истории
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }, [messages]);
 
   // автоскролл вниз
   useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
-    }
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, open]);
 
-  const handleSend = async () => {
+  const sendMessage = async () => {
     const text = input.trim();
-    if (!text || sending) return;
+    if (!text || loading) return;
 
-    // добавляем сообщение пользователя
-    const userMsg: ChatMessage = {
-      id: `u_${Date.now()}`,
-      from: "user",
-      text,
+    const userMessage: ChatMessage = {
+      id: `m_${Date.now()}`,
+      role: "user",
+      content: text,
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setSending(true);
+    setLoading(true);
 
-    // спрашиваем GPT
-    const replyText = await askGpt(text);
+    try {
+      // готовим историю для API (без id)
+      const apiMessages = [...messages, userMessage].map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
 
-    const botMsg: ChatMessage = {
-      id: `b_${Date.now()}`,
-      from: "bot",
-      text: replyText,
-    };
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: apiMessages }),
+      });
 
-    setMessages((prev) => [...prev, botMsg]);
-    setSending(false);
+      const data = await res.json();
+
+      if (!res.ok || !data?.message?.content) {
+        throw new Error("Bad response");
+      }
+
+      const assistantMessage: ChatMessage = {
+        id: `a_${Date.now()}`,
+        role: "assistant",
+        content: data.message.content,
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      console.error(err);
+      const assistantMessage: ChatMessage = {
+        id: `err_${Date.now()}`,
+        role: "assistant",
+        content:
+          "Упс, что-то пошло не так при обращении к модели. Попробуйте ещё раз чуть позже 🙏",
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      sendMessage();
     }
   };
 
   return (
     <>
-      {/* Кнопка открытия чата (floating) */}
+      {/* Плавающая кнопка открытия */}
       {!open && (
         <button
-  onClick={() => setOpen(true)}
-  className="
-    fixed
-    z-30
-    bottom-20 right-4    /* чуть выше, чтобы не мешалась нижним элементам карты */
-    md:bottom-6 md:right-6
-    rounded-full
-    bg-[#177ee1]
-    text-white
-    shadow-lg
-    w-12 h-12
-    flex items-center justify-center
-    hover:bg-[#0f6ac4]
-    active:scale-95
-  "
->
-  <MessageCircle className="w-6 h-6" />
-</button>
-
+          onClick={() => setOpen(true)}
+          className="
+            fixed bottom-24 right-4 z-30
+            rounded-full shadow-lg
+            w-12 h-12
+            flex items-center justify-center
+            bg-[#177ee1] hover:bg-[#0f6ac4]
+            text-white
+          "
+        >
+          <MessageCircle className="w-6 h-6" />
+        </button>
       )}
 
-      {/* Сам чат */}
+      {/* Окно чата */}
       {open && (
-  <div
-    className="
-      fixed
-      z-30
-
-      /* Мобилка: снизу почти на всю ширину */
-      inset-x-2 bottom-2
-      w-auto
-
-      /* Десктоп: компактный виджет справа снизу */
-      md:bottom-6 md:right-6 md:left-auto md:inset-x-auto md:w-[380px]
-
-      bg-white
-      rounded-2xl
-      shadow-2xl
-      border border-gray-200
-      flex flex-col
-      overflow-hidden
-    "
-  >
-          {/* Заголовок */}
-          <div className="flex items-center justify-between px-3 py-2 bg-[#177ee1] text-white">
+        <div
+          className="
+            fixed bottom-20 right-3 z-30
+            w-[90%] max-w-xs md:max-w-sm
+            bg-white rounded-2xl shadow-2xl
+            flex flex-col
+          "
+        >
+          {/* Хедер */}
+          <div className="flex items-center justify-between px-3 py-2 border-b">
             <div>
-              <p className="text-sm font-semibold">Invisioo ИИ-ассистент</p>
-              <p className="text-[11px] text-white/80">
-                Помогу с доступностью и вакансиями
+              <p className="text-xs font-semibold">Invisioo · ИИ-помощник</p>
+              <p className="text-[10px] text-gray-500">
+                Поможет с картой и доступностью мест
               </p>
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="p-1 rounded-full hover:bg-white/15"
+              className="text-gray-500 hover:text-gray-800"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          {/* История сообщений */}
-          <div className="flex-1 px-3 py-2 space-y-2 overflow-y-auto max-h-80 bg-[#f5f6f7]">
+          {/* История */}
+          <div className="flex-1 px-3 py-2 overflow-y-auto max-h-72 text-xs">
+            {messages.length === 0 && (
+              <p className="text-gray-500 text-[11px]">
+                Привет! Я могу объяснить, что значат цвета маркеров, помочь
+                выбрать маршруты для разных категорий и подсказать по доступности
+                мест. Напишите ваш вопрос 🙂
+              </p>
+            )}
+
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={`flex ${
-                  m.from === "user" ? "justify-end" : "justify-start"
+                className={`mb-2 flex ${
+                  m.role === "user" ? "justify-end" : "justify-start"
                 }`}
               >
                 <div
-                  className={`px-3 py-2 rounded-2xl text-xs max-w-[80%] whitespace-pre-wrap ${
-                    m.from === "user"
+                  className={`px-2.5 py-1.5 rounded-2xl max-w-[80%] whitespace-pre-wrap ${
+                    m.role === "user"
                       ? "bg-[#177ee1] text-white rounded-br-sm"
-                      : "bg-white text-gray-900 border border-gray-200 rounded-bl-sm"
+                      : "bg-gray-100 text-gray-900 rounded-bl-sm"
                   }`}
                 >
-                  {m.text}
+                  {m.content}
                 </div>
               </div>
             ))}
@@ -157,30 +183,35 @@ export default function ChatWidget() {
           </div>
 
           {/* Поле ввода */}
-          <div className="border-t border-gray-200 p-2 bg-white">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              rows={2}
-              className="w-full text-xs border border-gray-300 rounded-xl px-3 py-2 resize-none outline-none focus:ring-1 focus:ring-[#177ee1]"
-              placeholder="Опишите свою ситуацию или задайте вопрос…"
-            />
-
-            <button
-              onClick={handleSend}
-              disabled={sending || !input.trim()}
-              className={`
-                mt-2 w-full rounded-xl text-xs font-semibold py-2
-                ${
-                  sending || !input.trim()
-                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                    : "bg-[#177ee1] text-white hover:bg-[#0f6ac4]"
-                }
-              `}
-            >
-              {sending ? "Отправка…" : "Отправить"}
-            </button>
+          <div className="border-t px-3 py-2">
+            <div className="flex items-end gap-2">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Напишите вопрос…"
+                rows={1}
+                className="
+                  flex-1 resize-none text-xs
+                  border rounded-xl px-2 py-1
+                  focus:outline-none focus:ring-1 focus:ring-[#177ee1]
+                "
+              />
+              <button
+                onClick={sendMessage}
+                disabled={loading || !input.trim()}
+                className={`
+                  px-3 py-1.5 rounded-xl text-xs font-semibold
+                  ${
+                    loading || !input.trim()
+                      ? "bg-gray-200 text-gray-500"
+                      : "bg-[#177ee1] hover:bg-[#0f6ac4] text-white"
+                  }
+                `}
+              >
+                {loading ? "..." : "Отпр."}
+              </button>
+            </div>
           </div>
         </div>
       )}

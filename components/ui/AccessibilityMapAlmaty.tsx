@@ -898,6 +898,7 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
 
   const [browserId, setBrowserId] = useState<string | null>(null);
 const [showFullRating, setShowFullRating] = useState(false);
+const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   // 👇 флаг мобилки
   const [isMobile, setIsMobile] = useState(false);
@@ -1203,15 +1204,18 @@ const [showFullRating, setShowFullRating] = useState(false);
         </div>
 
         {/* Поиск */}
-        <div className="flex items-center bg-white border border-gray-200 rounded-xl px-2 py-1 gap-1 shadow-sm">
-          <Search size={14} className="text-gray-500" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Поиск места, категории или адреса"
-            className="w-full outline-none text-[12px] bg-transparent"
-          />
-        </div>
+     {/* Поиск */}
+<div className="flex items-center bg-white border border-gray-200 rounded-xl px-2 py-1 gap-1 shadow-sm">
+  <Search size={14} className="text-gray-500" />
+  <input
+    id="mobile-search-input"                // 👈 ДОБАВИЛИ id
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    placeholder="Поиск места, категории или адреса"
+    className="w-full outline-none text-[12px] bg-transparent"
+  />
+</div>
+
 
         {/* Вход + подписка */}
         <div className="flex gap-2">
@@ -1395,6 +1399,28 @@ const [showFullRating, setShowFullRating] = useState(false);
     <span>👁 Показать доступности (значение цветов и иконок)</span>
   </button>
 )}
+{isMobile && mobileSearchOpen && (
+  <div className="absolute top-3 left-1/2 -translate-x-1/2 w-[94%] z-30">
+    <div className="bg-white rounded-2xl shadow-lg p-2 flex items-center gap-2 border">
+      <Search className="text-gray-500" size={18} />
+
+      <input
+        id="mobile-search-input"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Поиск места, категории или адреса"
+        className="flex-1 text-sm outline-none"
+      />
+
+      <button
+        onClick={() => setMobileSearchOpen(false)}
+        className="text-gray-600 text-xl px-2"
+      >
+        ✕
+      </button>
+    </div>
+  </div>
+)}
 
       {/* Map */}
       <MapContainer
@@ -1454,27 +1480,34 @@ const [showFullRating, setShowFullRating] = useState(false);
       
       {/* Лого / Домой */}
       <button
-        className="flex flex-col items-center flex-1 text-[10px] text-gray-700"
-        onClick={() => setFlyTo([43.238949, 76.889709])}
-      >
-        <span className="text-xl">🏠</span>
-        <span>Главная</span>
-      </button>
+  className="flex flex-col items-center flex-1 text-[10px] text-gray-700"
+  onClick={() => {
+    setFlyTo([43.238949, 76.889709]);  // центр
+    setMobileAccessLegendOpen(true);  // 👈 сразу открыть окно
+  }}
+>
+  <span className="text-xl">🏠</span>
+  <span>Главная</span>
+</button>
+
 
       {/* Поиск */}
-      <button
-        className="flex flex-col items-center flex-1 text-[10px] text-gray-700"
-        onClick={() => {
-          // фокус на поиске: просто скроллим вверх,
-          // или можно повесить ref на input, если хочешь прям фокус
-          const el = document.getElementById("mobile-search-input");
-          el?.scrollIntoView({ behavior: "smooth", block: "center" });
-          (el as HTMLInputElement | null)?.focus();
-        }}
-      >
-        <span className="text-xl">🔎</span>
-        <span>Поиск</span>
-      </button>
+<button
+  className="flex flex-col items-center flex-1 text-[10px] text-gray-700"
+  onClick={() => {
+    setMobileSearchOpen(true);
+
+    // откроем окно корректно
+    setTimeout(() => {
+      const el = document.getElementById("mobile-search-input");
+      el?.focus();
+    }, 150);
+  }}
+>
+  <span className="text-xl">🔎</span>
+  <span>Поиск</span>
+</button>
+
 
       {/* Фильтры доступности */}
       <button
