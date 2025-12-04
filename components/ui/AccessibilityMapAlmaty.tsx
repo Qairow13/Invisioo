@@ -443,7 +443,7 @@ const INITIAL_PLACES: Place[] = [
 
     photos: {
       outside: [
-        "/picture/hospital16/IMG_5668.PNG",
+    
         "/picture/hospital16/IMG_5669.PNG",
         "/picture/hospital16/IMG_5670.PNG",
       ],
