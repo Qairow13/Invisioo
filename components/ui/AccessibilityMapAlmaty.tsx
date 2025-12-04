@@ -219,7 +219,7 @@ const INITIAL_PLACES: Place[] = [
       ],
       accessibility: [
         "/picture/hotel/IMG_5660.PNG",
-        "/picture/hotel/IMG_5662.PNG",
+        "/picture/hotel/IMG_5662.jpg",
       ],
     },
   },
