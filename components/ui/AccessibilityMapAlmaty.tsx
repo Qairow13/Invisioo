@@ -159,7 +159,7 @@ const ACCESS_CATEGORIES = [
 
 const INITIAL_PLACES: Place[] = [
   {
-    id: "PMSP",
+    id: "PSMP",
     name: "Центр ПМСП Алмалинского район",
     category: "Поликлиника",
     status: "accessible",
@@ -213,7 +213,7 @@ const INITIAL_PLACES: Place[] = [
 
     photos: {
       outside: [
-        "/picture/hotel/IMG_5658.png",
+        "public/picture/hotel/IMG_5658.png",
         "/picture/hotel/IMG_5659.png",
         "/picture/hotel/IMG_5661.png",
       ],
@@ -1748,7 +1748,7 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
 
     <div className="flex gap-2 overflow-x-auto pb-1">
       {(selectedPlace.photos?.accessibility ?? []).map((raw) => {
-        // raw = "picture/PSMP/IMG_5622.PNG" или "/picture/PSMP/IMG_5622.PNG"
+        // raw: "picture/psmp/img_5622.png"
         const src = raw.startsWith("/") ? raw : `/${raw}`;
 
         return (
@@ -1763,6 +1763,7 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
     </div>
   </div>
 )}
+
 
                         {/* Оценка доступности пользователем */}
                         <div className="border rounded-xl p-3 bg-white">
