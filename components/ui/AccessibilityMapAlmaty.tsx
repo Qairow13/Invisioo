@@ -1748,7 +1748,6 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
 
     <div className="flex gap-2 overflow-x-auto pb-1">
       {(selectedPlace.photos?.accessibility ?? []).map((raw) => {
-        // raw: "picture/psmp/img_5622.png"
         const src = raw.startsWith("/") ? raw : `/${raw}`;
 
         return (
