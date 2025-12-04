@@ -213,13 +213,13 @@ const INITIAL_PLACES: Place[] = [
 
     photos: {
       outside: [
-        "public/picture/hotel/IMG_5658.png",
-        "/picture/hotel/IMG_5659.png",
-        "/picture/hotel/IMG_5661.png",
+        "public/picture/hotel/IMG_5658.PNG",
+        "/picture/hotel/IMG_5659.PNG",
+        "/picture/hotel/IMG_5661.PNG",
       ],
       accessibility: [
-        "/picture/hotel/IMG_5660.png",
-        "/picture/hotel/IMG_5662.png",
+        "/picture/hotel/IMG_5660.PNG",
+        "/picture/hotel/IMG_5662.PNG",
       ],
     },
   },
@@ -1751,12 +1751,17 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
         const src = raw.startsWith("/") ? raw : `/${raw}`;
 
         return (
-          <img
-            key={src}
-            src={src}
-            alt="Элемент доступности"
-            className="w-20 h-20 rounded-xl object-cover border border-gray-200"
-          />
+          <div key={src} className="flex flex-col items-center">
+            <img
+              src={src}
+              alt="Элемент доступности"
+              className="w-20 h-20 rounded-xl object-cover border border-gray-200"
+            />
+            {/* ВРЕМЕННО: покажем путь, который реально используется */}
+            <span className="text-[10px] text-gray-500 break-all mt-1">
+              {src}
+            </span>
+          </div>
         );
       })}
     </div>
