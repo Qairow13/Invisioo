@@ -51,6 +51,12 @@ const [chatOpen, setChatOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+const newChat = () => {
+  setMessages([]);
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+};
 
   // загрузка истории из localStorage
   useEffect(() => {
@@ -169,20 +175,33 @@ const [chatOpen, setChatOpen] = useState(false);
           "
         >
           {/* Хедер */}
-          <div className="flex items-center justify-between px-3 py-2 border-b">
-            <div>
-              <p className="text-xs font-semibold">Invisioo · ИИ-помощник</p>
-              <p className="text-[10px] text-gray-500">
-                Поможет с картой и доступностью мест
-              </p>
-            </div>
-            <button
-              onClick={() => setOpen(false)}
-              className="text-gray-500 hover:text-gray-800"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+         <div className="flex items-center justify-between px-3 py-2 border-b">
+  <div>
+    <p className="text-xs font-semibold">Invisioo · ИИ-помощник</p>
+    <p className="text-[10px] text-gray-500">
+      Поможет с картой и доступностью мест
+    </p>
+  </div>
+
+  <div className="flex items-center gap-2">
+    {/* КНОПКА НОВОГО ЧАТА */}
+    <button
+      onClick={newChat}
+      className="text-[10px] text-[#177ee1] hover:underline"
+    >
+      Новый чат
+    </button>
+
+    {/* Кнопка закрытия */}
+    <button
+      onClick={() => setOpen(false)}
+      className="text-gray-500 hover:text-gray-800"
+    >
+      <X className="w-4 h-4" />
+    </button>
+  </div>
+</div>
+
 
           {/* История */}
           <div className="flex-1 px-3 py-2 overflow-y-auto max-h-72 text-xs">
