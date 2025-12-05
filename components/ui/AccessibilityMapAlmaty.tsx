@@ -1497,7 +1497,7 @@ const [chatOpen, setChatOpen] = useState(false);
       
       >
         {/* сюда поставишь свою иконку домика */}
-        <img src="/nav/home.PNG" alt="" className="w-5 h-5" />
+        <img src="/nav/home.png" alt="" className="w-5 h-5" />
         <span>Главная</span>
       </button>
 
@@ -1520,7 +1520,7 @@ const [chatOpen, setChatOpen] = useState(false);
         onClick={() => setCategoryOpen(true)}
       >
         {/* иконка категорий доступности */}
-        <img src="/nav/b.PNG" alt="" className="w-5 h-5" />
+        <img src="/nav/b.png" alt="" className="w-5 h-5" />
         <span>Категории</span>
       </button>
 
@@ -1546,7 +1546,7 @@ const [chatOpen, setChatOpen] = useState(false);
         }}
       >
         {/* иконка точки/человечка */}
-        <img src="/nav/location.PNG" alt="" className="w-5 h-5" />
+        <img src="/nav/location.png" alt="" className="w-5 h-5" />
         <span>Моя локация</span>
       </button>
 
@@ -1556,7 +1556,7 @@ const [chatOpen, setChatOpen] = useState(false);
         className="flex flex-col items-center flex-1 text-[10px] text-[#177ee1] gap-1"
       >
         {/* иконка людей/портфеля — что захочешь */}
-        <img src="/nav/vector.PNG" alt="" className="w-5 h-5" />
+        <img src="/nav/vector.png" alt="" className="w-5 h-5" />
         <span>Вакансии</span>
       </Link>
     </div>
