@@ -1487,7 +1487,7 @@ const [chatOpen, setChatOpen] = useState(false);
       rounded-[999px]
       border-2 border-[#177ee1]
       shadow-[0_8px_20px_rgba(0,0,0,0.12)]
-      px-4 py-3 gap-2
+      px-4 py-1 gap-2
     ">
       {/* Главная */}
       <button
@@ -1556,7 +1556,7 @@ const [chatOpen, setChatOpen] = useState(false);
         className="flex flex-col items-center flex-1 text-[10px] text-[#177ee1] gap-1"
       >
         {/* иконка людей/портфеля — что захочешь */}
-        <img src="/nav/vector.png" alt="" className="w-5 h-5" />
+        <img src="/nav/Vector.png" alt="" className="w-5 h-5" />
         <span>Вакансии</span>
       </Link>
     </div>
