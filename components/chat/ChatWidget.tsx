@@ -12,8 +12,41 @@ type ChatMessage = {
 
 const STORAGE_KEY = "invisioo_chat_history_v1";
 
-export default function ChatWidget() {
-  const [open, setOpen] = useState(false);
+type ChatWidgetProps = {
+  /**
+   * Внешний контроль открытия (например, для мобилки из нижнего бара).
+   * Если не передан, чат сам управляет своим состоянием (как раньше).
+   */
+  openExternal?: boolean;
+  /**
+   * Коллбек, который вызывается при изменении состояния (открыт/закрыт).
+   */
+  onOpenExternalChange?: (open: boolean) => void;
+  /**
+   * Скрыть плавающую кнопку (для мобилки с нижним баром).
+   */
+  hideFloatingButton?: boolean;
+};
+
+export default function ChatWidget({
+  openExternal,
+  onOpenExternalChange,
+  hideFloatingButton,
+}: ChatWidgetProps) {
+  // внутреннее состояние открытия (если нет внешнего управления)
+  const [internalOpen, setInternalOpen] = useState(false);
+const [chatOpen, setChatOpen] = useState(false);
+
+  const isControlled = openExternal !== undefined;
+  const open = isControlled ? !!openExternal : internalOpen;
+
+  const setOpen = (value: boolean) => {
+    if (!isControlled) {
+      setInternalOpen(value);
+    }
+    onOpenExternalChange?.(value);
+  };
+
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -108,8 +141,8 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Плавающая кнопка открытия */}
-      {!open && (
+      {/* Плавающая кнопка открытия (десктоп или если не скрыта) */}
+      {!hideFloatingButton && !open && (
         <button
           onClick={() => setOpen(true)}
           className="
@@ -157,7 +190,7 @@ export default function ChatWidget() {
               <p className="text-gray-500 text-[11px]">
                 Привет! Я могу объяснить, что значат цвета маркеров, помочь
                 выбрать маршруты для разных категорий и подсказать по доступности
-                мест. Напишите ваш вопрос 🙂
+                мест. Напишите ваш вопрос 🙂 {/* текст не менял */}
               </p>
             )}
 

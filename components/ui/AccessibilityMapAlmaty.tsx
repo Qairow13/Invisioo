@@ -899,7 +899,7 @@ const [mobileAccessLegendOpen, setMobileAccessLegendOpen] = useState(false);
   const [browserId, setBrowserId] = useState<string | null>(null);
 const [showFullRating, setShowFullRating] = useState(false);
 const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
-
+const [chatOpen, setChatOpen] = useState(false);
   // 👇 флаг мобилки
   const [isMobile, setIsMobile] = useState(false);
 
@@ -1164,8 +1164,13 @@ const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   return (
     <div className={`relative w-full h-[100dvh] md:h-screen ${rootBg}`}>
-      {/* Плавающий чат ИИ */}
-      <ChatWidget />
+       {isMobile && (
+      <ChatWidget
+        openExternal={chatOpen}
+        onOpenExternalChange={setChatOpen}
+        hideFloatingButton
+      />
+    )}
 
       {/* Хедер / панель справа как 2ГИС */}
         {!isMobile && (
@@ -1476,51 +1481,52 @@ const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 {/* Мобильный футбар как в 2ГИС */}
 {isMobile && !selectedPlace && (
   <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-20 w-[94%]">
-    <div className="flex items-center justify-between bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_20px_rgba(0,0,0,0.12)] px-3 py-2 gap-2">
+    <div className="
+      flex items-center justify-between
+      bg-white
+      rounded-[999px]
+      border-2 border-[#177ee1]
+      shadow-[0_8px_20px_rgba(0,0,0,0.12)]
+      px-4 py-3 gap-2
+    ">
+      {/* Главная */}
+      <button
+      type="button"
+    onClick={() => setMobileAccessLegendOpen(true)}
+        className="flex flex-col items-center flex-1 text-[10px] text-[#177ee1] gap-1"
       
-      {/* Лого / Домой */}
-      <button
-  className="flex flex-col items-center flex-1 text-[10px] text-gray-700"
-  onClick={() => {
-    setFlyTo([43.238949, 76.889709]);  // центр
-    setMobileAccessLegendOpen(true);  // 👈 сразу открыть окно
-  }}
->
-  <span className="text-xl">🏠</span>
-  <span>Главная</span>
-</button>
+      >
+        {/* сюда поставишь свою иконку домика */}
+        <img src="/nav/home.PNG" alt="" className="w-5 h-5" />
+        <span>Главная</span>
+      </button>
 
+      {/* ИИ-ассистент */}
 
-      {/* Поиск */}
 <button
-  className="flex flex-col items-center flex-1 text-[10px] text-gray-700"
-  onClick={() => {
-    setMobileSearchOpen(true);
-
-    // откроем окно корректно
-    setTimeout(() => {
-      const el = document.getElementById("mobile-search-input");
-      el?.focus();
-    }, 150);
-  }}
+    className="flex flex-col items-center flex-1 text-[10px] text-[#177ee1] gap-1"
+    onClick={() => setChatOpen(true)}   // 👉 Открываем виджет
 >
-  <span className="text-xl">🔎</span>
-  <span>Поиск</span>
+    {/* 👉 ВСТАВЛЯЕМ НУЖНУЮ КАРТИНКУ */}
+    <img src="/nav/i.png" alt="ИИ ассистент" className="w-8 h-8" />
+
+    <span>ИИ&nbsp;- ассистент</span>
 </button>
 
 
-      {/* Фильтры доступности */}
+      {/* Категории */}
       <button
-        className="flex flex-col items-center flex-1 text-[10px] text-gray-700"
+        className="flex flex-col items-center flex-1 text-[10px] text-[#177ee1] gap-1"
         onClick={() => setCategoryOpen(true)}
       >
-        <span className="text-xl">♿</span>
+        {/* иконка категорий доступности */}
+        <img src="/nav/b.PNG" alt="" className="w-5 h-5" />
         <span>Категории</span>
       </button>
 
-      {/* Мое местоположение */}
+      {/* Моя локация */}
       <button
-        className="flex flex-col items-center flex-1 text-[10px] text-gray-700"
+        className="flex flex-col items-center flex-1 text-[10px] text-[#177ee1] gap-1"
         onClick={() => {
           if (typeof window === "undefined") return;
           if (!navigator.geolocation) {
@@ -1539,9 +1545,20 @@ const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
           );
         }}
       >
-        <span className="text-xl">📍</span>
-        <span>Я здесь</span>
+        {/* иконка точки/человечка */}
+        <img src="/nav/location.PNG" alt="" className="w-5 h-5" />
+        <span>Моя локация</span>
       </button>
+
+      {/* Вакансии (вместо "Мои друзья") */}
+      <Link
+        href="/vacancies"
+        className="flex flex-col items-center flex-1 text-[10px] text-[#177ee1] gap-1"
+      >
+        {/* иконка людей/портфеля — что захочешь */}
+        <img src="/nav/vector.PNG" alt="" className="w-5 h-5" />
+        <span>Вакансии</span>
+      </Link>
     </div>
   </div>
 )}
@@ -2209,7 +2226,7 @@ const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
                     }
                     className={`flex items-center gap-3 p-3 rounded-xl border text-left transition ${
                       act
-                        ? "border-[#e53935] bg-[#fff4f2]"
+                        ? "border-[#177ee1] bg-[#fff4f2]"
                         : "border-gray-200 hover:bg-gray-50"
                     }`}
                   >
@@ -2231,7 +2248,7 @@ const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
               </button>
               <Button
                 onClick={() => setCategoryOpen(false)}
-                className="rounded-xl bg-[#e53935] hover:bg-[#d23431]"
+                className="rounded-xl bg-[#177ee1] hover:bg-[#177ee]"
               >
                 Применить
               </Button>
