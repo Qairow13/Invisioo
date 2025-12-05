@@ -35,7 +35,6 @@ export default function ChatWidget({
 }: ChatWidgetProps) {
   // внутреннее состояние открытия (если нет внешнего управления)
   const [internalOpen, setInternalOpen] = useState(false);
-const [chatOpen, setChatOpen] = useState(false);
 
   const isControlled = openExternal !== undefined;
   const open = isControlled ? !!openExternal : internalOpen;
@@ -51,12 +50,14 @@ const [chatOpen, setChatOpen] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
-const newChat = () => {
-  setMessages([]);
-  if (typeof window !== "undefined") {
-    localStorage.removeItem(STORAGE_KEY);
-  }
-};
+
+  // кнопка "Новый чат"
+  const newChat = () => {
+    setMessages([]);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  };
 
   // загрузка истории из localStorage
   useEffect(() => {
@@ -105,7 +106,7 @@ const newChat = () => {
         content: m.content,
       }));
 
-      const res = await fetch("/api/chat", {
+      const res = await fetch("/api/chat-gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: apiMessages }),
@@ -145,6 +146,40 @@ const newChat = () => {
     }
   };
 
+  // 👇 тут рисуем кнопку "Открыть вакансии", если ассистент в тексте упомянул ссылку
+  const renderMessageContent = (m: ChatMessage) => {
+    // Пользовательские сообщения — просто текст
+    if (m.role === "user") return m.content;
+
+    const VAC_URL = "https://invisioo.kz/vacancies";
+
+    if (!m.content.includes(VAC_URL)) {
+      return m.content;
+    }
+
+    const parts = m.content.split(VAC_URL);
+
+    return (
+      <>
+        {parts.map((part, idx) => (
+          <span key={idx}>
+            {part}
+            {idx < parts.length - 1 && (
+              <a
+                href={VAC_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block mt-1 px-2 py-1 rounded-lg bg-[#177ee1] text-white text-[11px] hover:bg-[#0f6ac4]"
+              >
+                Открыть вакансии
+              </a>
+            )}
+          </span>
+        ))}
+      </>
+    );
+  };
+
   return (
     <>
       {/* Плавающая кнопка открытия (десктоп или если не скрыта) */}
@@ -175,33 +210,32 @@ const newChat = () => {
           "
         >
           {/* Хедер */}
-         <div className="flex items-center justify-between px-3 py-2 border-b">
-  <div>
-    <p className="text-xs font-semibold">Invisioo · ИИ-помощник</p>
-    <p className="text-[10px] text-gray-500">
-      Поможет с картой и доступностью мест
-    </p>
-  </div>
+          <div className="flex items-center justify-between px-3 py-2 border-b">
+            <div>
+              <p className="text-xs font-semibold">Invisioo · ИИ-помощник</p>
+              <p className="text-[10px] text-gray-500">
+                Поможет с картой и доступностью мест
+              </p>
+            </div>
 
-  <div className="flex items-center gap-2">
-    {/* КНОПКА НОВОГО ЧАТА */}
-    <button
-      onClick={newChat}
-      className="text-[10px] text-[#177ee1] hover:underline"
-    >
-      Новый чат
-    </button>
+            <div className="flex items-center gap-2">
+              {/* КНОПКА НОВОГО ЧАТА */}
+              <button
+                onClick={newChat}
+                className="text-[10px] text-[#177ee1] hover:underline"
+              >
+                Новый чат
+              </button>
 
-    {/* Кнопка закрытия */}
-    <button
-      onClick={() => setOpen(false)}
-      className="text-gray-500 hover:text-gray-800"
-    >
-      <X className="w-4 h-4" />
-    </button>
-  </div>
-</div>
-
+              {/* Кнопка закрытия */}
+              <button
+                onClick={() => setOpen(false)}
+                className="text-gray-500 hover:text-gray-800"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
 
           {/* История */}
           <div className="flex-1 px-3 py-2 overflow-y-auto max-h-72 text-xs">
@@ -227,7 +261,7 @@ const newChat = () => {
                       : "bg-gray-100 text-gray-900 rounded-bl-sm"
                   }`}
                 >
-                  {m.content}
+                  {renderMessageContent(m)}
                 </div>
               </div>
             ))}
