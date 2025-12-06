@@ -187,6 +187,7 @@ export default function ChatWidget({
         <button
           onClick={() => setOpen(true)}
           className="
+          hidden md:flex
             fixed bottom-24 right-4 z-30
             rounded-full shadow-lg
             w-12 h-12
@@ -203,14 +204,14 @@ export default function ChatWidget({
       {open && (
         <div
           className="
-            fixed bottom-20 right-3 z-30
+            fixed bottom-25 right-3 z-30
             w-[90%] max-w-xs md:max-w-sm
             bg-white rounded-2xl shadow-2xl
             flex flex-col
           "
         >
           {/* Хедер */}
-          <div className="flex items-center justify-between px-3 py-2 border-b">
+          <div className="flex items-center justify-between px-3 py-4 border-b">
             <div>
               <p className="text-xs font-semibold">Invisioo · ИИ-помощник</p>
               <p className="text-[10px] text-gray-500">
